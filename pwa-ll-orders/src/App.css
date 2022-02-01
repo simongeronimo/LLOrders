@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap');
+
+.cuerpo{
+  overflow: hidden;
+}
+
+.titulo {
+  padding: 0px;
+  font-family: 'Lobster', cursive;
+  font-size: 16vw;
+  line-height: 16vw;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  
+  color: #000000;
+}
+
+.texto {
+  border: 0px;
+  border-bottom: 2px solid;
+  padding: 0px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 7vw;
+  line-height: 7vw;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 7.5vw;
+  color: #000000;
+}
+
+.button {
+  font-family: 'Josefin Sans', sans-serif;
+  padding: 2vw;
+  padding-left: 7.5vw;
+  padding-right: 7.5vw;
+  font-size: 7vw;
+  line-height: 7vw;
+  border: 5px solid #000000;
+  box-sizing: border-box;
+  color: #000000;
+  background-color: #FFFFFF;
+}
+
+.container {
+  padding: 0px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.containerInputs {
+  padding: 10px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.Purchased {
+  text-decoration: line-through;
+}
+
+.logo{
+  padding: 0px;
+  padding-top: 30px;
+  max-width: 85%;
+  height: auto;
+  object-fit: scale-down;
+}
