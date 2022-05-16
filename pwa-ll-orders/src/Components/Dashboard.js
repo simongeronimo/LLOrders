@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button, Alert } from 'bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+import axios from "axios";
 
 export default function Dashboard() {
 const {currentUser, logout} =  useAuth()
@@ -22,18 +23,22 @@ async function handleLogout(){
     }
 }
 
-function Products() {
-  function loadProducts() {
-    fetch("ll-orders-backend.herokuapp.com/v1/products", {"method": "GET"})
+async function Products() {
+  async function loadProducts() {
+    try {
+      fetch("https://ll-orders-proxy.herokuapp.com/https://ll-orders-backend.herokuapp.com/v1/products", {"method": "GET"})
       .then((res) => res.json())
-      .then((data) => setProducts(data.products))
+      .then((data) => setProducts(data.products));
+    } catch (error) {
+      console.log("error");
+      console.log(error);
+    }
   }
-
   loadProducts();
-  console.log(products)
+  console.log('test')
 }
 
-  useEffect(() => {Products()});
+  useEffect(() => {Products()}, []);
 
 
   return <div class="container">
