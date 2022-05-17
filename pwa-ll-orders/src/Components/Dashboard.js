@@ -3,13 +3,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button, Alert } from 'bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
-import axios from "axios";
 
 export default function Dashboard() {
 const {currentUser, logout} =  useAuth()
 const [error, setError] =useState("")
 const navigate = useNavigate()
 const [products, setProducts] = React.useState([]);
+const [, updateState] = React.useState();
+const forceUpdate = React.useCallback(() => updateState({}), []);
 
 async function handleLogout(){
     setError('')
@@ -21,6 +22,34 @@ async function handleLogout(){
     } catch {
         setError('Failed to log out')
     }
+}
+async function handleSave(){
+  setError('')
+    let idString = "";
+    let quantityString = "";
+    products.forEach(product => {
+      idString=idString+product.id+",";
+      quantityString= quantityString+product.quantity+",";
+    });
+    idString=idString.slice(0,-1);
+    quantityString=quantityString.slice(0,-1);
+    const params = {
+      ids: idString,
+      quantities: quantityString 
+    };
+  var urlencoded = new URLSearchParams();
+  urlencoded.append("ids", idString);
+  urlencoded.append("quantities", quantityString);
+  
+  var requestOptions = {
+    method: 'POST',
+    body: urlencoded
+  };
+  
+  fetch("https://ll-orders-proxy.herokuapp.com/https://ll-orders-backend.herokuapp.com/v1/saveProducts", requestOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
 }
 
 async function Products() {
@@ -40,6 +69,14 @@ async function Products() {
 
   useEffect(() => {Products()}, []);
 
+  function subtractOne(product) {
+    product.quantity=product.quantity-1;
+    forceUpdate();
+ }; 
+  function addOne(product) {
+    product.quantity=product.quantity+1;
+    forceUpdate();
+ }; 
 
   return <div class="container">
       {error && <Alert variant="danger">{error}</Alert>}
@@ -56,11 +93,11 @@ async function Products() {
                                               </h2>
                                               </div>
                                           <div class="d-flex justify-content-between align-self-center">
-                                              <button style={{backgroundColor: "white", border: "none"}}><i class="bi bi-dash-circle p-1" style={{fontSize: "2rem"}}></i></button>
+                                              <button onClick={() => subtractOne(product)} style={{backgroundColor: "white", border: "none"}}><i class="bi bi-dash-circle p-1" style={{fontSize: "2rem"}}></i></button>
                                               <div class="container border border-dark border-4 text-wrap d-flex allign-items-center" style={{width: "40px", height: "40px"}}>
                                                   {product.quantity}
                                               </div>
-                                              <button style={{backgroundColor: "white", border: "none"}}><i class="bi bi-plus-circle p-1" style={{fontSize: "2rem"}}></i></button>
+                                              <button onClick={() => addOne(product)} style={{backgroundColor: "white", border: "none"}}><i class="bi bi-plus-circle p-1" style={{fontSize: "2rem"}}></i></button>
                                           </div>
                                           </div>
                                                <div id={`collapse${product.id}`} class="accordion-collapse collapse" aria-labelledby={`heading${product.id}`}data-bs-parent="#accordionFlushExample">
@@ -69,6 +106,7 @@ async function Products() {
                                           </div>
                             })}
               </div>
+      <button type="button" class="mt-3 btn btn-success" onClick={handleSave}>Save</button>
       <button type="button" class="mt-3 btn btn-danger" onClick={handleLogout}>Log out</button>
 
   </div>;
