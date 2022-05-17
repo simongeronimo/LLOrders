@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
 export default function Dashboard() {
-const {currentUser, logout} =  useAuth()
-const [error, setError] =useState("")
-const navigate = useNavigate()
+const {currentUser, logout} =  useAuth();
+const [error, setError] =useState("");
+const [saved, setSaved] =useState("Save");
+const navigate = useNavigate();
 const [products, setProducts] = React.useState([]);
 const [, updateState] = React.useState();
 const forceUpdate = React.useCallback(() => updateState({}), []);
@@ -50,6 +51,8 @@ async function handleSave(){
     .then(response => response.text())
     .then(result => console.log(result))
     .catch(error => console.log('error', error));
+    setSaved("SAVED!")
+  
 }
 
 async function Products() {
@@ -70,10 +73,12 @@ async function Products() {
   useEffect(() => {Products()}, []);
 
   function subtractOne(product) {
+    setSaved("Save");
     product.quantity=product.quantity-1;
     forceUpdate();
  }; 
   function addOne(product) {
+    setSaved("Save");
     product.quantity=product.quantity+1;
     forceUpdate();
  }; 
@@ -106,7 +111,7 @@ async function Products() {
                                           </div>
                             })}
               </div>
-      <button type="button" class="mt-3 btn btn-success" onClick={handleSave}>Save</button>
+      <button type="button" class="mt-3 btn btn-success" onClick={handleSave}>{saved}</button>
       <button type="button" class="mt-3 btn btn-danger" onClick={handleLogout}>Log out</button>
 
   </div>;
