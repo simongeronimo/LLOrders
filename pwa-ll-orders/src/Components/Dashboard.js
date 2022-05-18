@@ -9,6 +9,7 @@ const {currentUser, logout} =  useAuth();
 const [error, setError] =useState("");
 const [saved, setSaved] =useState("Save");
 const navigate = useNavigate();
+var dictionary = {};
 const [products, setProducts] = React.useState([]);
 const [, updateState] = React.useState();
 const forceUpdate = React.useCallback(() => updateState({}), []);
@@ -24,6 +25,14 @@ async function handleLogout(){
         setError('Failed to log out')
     }
 }
+async function handleReset(){
+  products.forEach(product => {
+    product.quantity=0;
+  });
+  setSaved("Save");
+  forceUpdate();
+}
+
 async function handleSave(){
   setError('')
     let idString = "";
@@ -34,10 +43,6 @@ async function handleSave(){
     });
     idString=idString.slice(0,-1);
     quantityString=quantityString.slice(0,-1);
-    const params = {
-      ids: idString,
-      quantities: quantityString 
-    };
   var urlencoded = new URLSearchParams();
   urlencoded.append("ids", idString);
   urlencoded.append("quantities", quantityString);
@@ -55,22 +60,43 @@ async function handleSave(){
   
 }
 
-async function Products() {
-  async function loadProducts() {
-    try {
-      fetch("https://ll-orders-proxy.herokuapp.com/https://ll-orders-backend.herokuapp.com/v1/products", {"method": "GET"})
-      .then((res) => res.json())
-      .then((data) => setProducts(data.products));
-    } catch (error) {
-      console.log("error");
-      console.log(error);
+
+async function loadProducts() {
+  dictionary["1"]=document.getElementById('kitchenCheckbox').checked;
+  dictionary["2"]=document.getElementById('pizzaCheckbox').checked;
+  var locations = "";
+  for(var key in dictionary) {
+    var value = dictionary[key];
+    if(value){
+      locations=locations+key+",";
     }
   }
-  loadProducts();
-  console.log('test')
+  locations=locations.slice(0,-1);
+  console.log("locations"+locations);
+  var urlencoded = new URLSearchParams();
+  urlencoded.append("locations", locations);
+  
+  var requestOptions = {
+    method: 'POST',
+    body: urlencoded
+  };
+  try {
+    fetch("https://ll-orders-proxy.herokuapp.com/https://ll-orders-backend.herokuapp.com/v1/products", requestOptions)
+    .then((res) => res.json())
+    .then((data) => setProducts(data.products));
+  } catch (error) {
+    console.log("error");
+    console.log(error);
+  }
 }
 
-  useEffect(() => {Products()}, []);
+async function firstStep() {
+  document.getElementById('kitchenCheckbox').checked=true;
+  document.getElementById('pizzaCheckbox').checked=true;
+  loadProducts();
+}
+
+  useEffect(() => {firstStep()}, []);
 
   function subtractOne(product) {
     setSaved("Save");
@@ -83,7 +109,22 @@ async function Products() {
     forceUpdate();
  }; 
 
+ function check()
+{
+  loadProducts();
+}
+
   return <div class="container">
+      <div class="checkboxes">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" onClick={check} type="checkbox" id="kitchenCheckbox"></input>
+          <label class="form-check-label" for="kitchenCheckbox">Kitchen</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" onClick={check} type="checkbox" id="pizzaCheckbox" value="option2"></input>
+          <label class="form-check-label" for="pizzaCheckbox">Pizza</label>
+        </div>
+      </div>
       {error && <Alert variant="danger">{error}</Alert>}
       <div class="accordion" id="accordionExample">
                         {products.map((product) => {
@@ -111,8 +152,11 @@ async function Products() {
                                           </div>
                             })}
               </div>
-      <button type="button" class="mt-3 btn btn-success" onClick={handleSave}>{saved}</button>
-      <button type="button" class="mt-3 btn btn-danger" onClick={handleLogout}>Log out</button>
+      <div class="botones">
+        <button type="button" class="mt-3 btn btn-success m-2"onClick={handleSave}>{saved}</button>
+        <button type="button" class="mt-3 btn btn-danger m-2" onClick={handleLogout}>Log out</button>
+        <button type="button" class="mt-3 btn btn-dark m-2" onClick={handleReset}>Reset</button>
+      </div>
 
   </div>;
 }
