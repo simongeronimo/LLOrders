@@ -64,32 +64,39 @@ async function handleSave(){
 async function loadProducts() {
   dictionary["1"]=document.getElementById('kitchenCheckbox').checked;
   dictionary["2"]=document.getElementById('pizzaCheckbox').checked;
-  var locations = "";
-  for(var key in dictionary) {
-    var value = dictionary[key];
-    if(value){
-      locations=locations+key+",";
+  if(dictionary["1"] || dictionary["2"]){
+
+    var locations = "";
+    for(var key in dictionary) {
+      var value = dictionary[key];
+      if(value){
+        locations=locations+key+",";
+      }
+    }
+    locations=locations.slice(0,-1);
+    console.log("locations"+locations);
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("locations", locations);
+    
+    var requestOptions = {
+      method: 'POST',
+      body: urlencoded
+    };
+    try {
+      fetch("https://ll-orders-proxy.herokuapp.com/https://ll-orders-backend.herokuapp.com/v1/products", requestOptions)
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products));
+    } catch (error) {
+      console.log("error");
+      console.log(error);
     }
   }
-  locations=locations.slice(0,-1);
-  console.log("locations"+locations);
-  var urlencoded = new URLSearchParams();
-  urlencoded.append("locations", locations);
-  
-  var requestOptions = {
-    method: 'POST',
-    body: urlencoded
-  };
-  try {
-    fetch("https://ll-orders-proxy.herokuapp.com/https://ll-orders-backend.herokuapp.com/v1/products", requestOptions)
-    .then((res) => res.json())
-    .then((data) => setProducts(data.products));
-  } catch (error) {
-    console.log("error");
-    console.log(error);
+  else{
+    setProducts([]);
+    forceUpdate();
   }
-}
-
+  }
+  
 async function firstStep() {
   document.getElementById('kitchenCheckbox').checked=true;
   document.getElementById('pizzaCheckbox').checked=true;
