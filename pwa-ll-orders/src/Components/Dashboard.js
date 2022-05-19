@@ -28,6 +28,7 @@ async function handleLogout(){
 async function handleReset(){
   products.forEach(product => {
     product.quantity=0;
+    product.quantity_case=0;
   });
   setSaved("Save");
   forceUpdate();
@@ -37,15 +38,19 @@ async function handleSave(){
   setError('')
     let idString = "";
     let quantityString = "";
+    let quantity_caseString = "";
     products.forEach(product => {
       idString=idString+product.id+",";
       quantityString= quantityString+product.quantity+",";
+      quantity_caseString= quantity_caseString+product.quantity_case+",";
     });
     idString=idString.slice(0,-1);
-    quantityString=quantityString.slice(0,-1);
+    quantityString=quantityString.slice(0,-1); 
+    quantity_caseString=quantity_caseString.slice(0,-1); 
   var urlencoded = new URLSearchParams();
   urlencoded.append("ids", idString);
   urlencoded.append("quantities", quantityString);
+  urlencoded.append("quantities_case", quantity_caseString);
   
   var requestOptions = {
     method: 'POST',
@@ -115,6 +120,16 @@ async function firstStep() {
     product.quantity=product.quantity+1;
     forceUpdate();
  }; 
+  function subtractOneCase(product) {
+    setSaved("Save");
+    product.quantity_case=product.quantity_case-1;
+    forceUpdate();
+ }; 
+  function addOneCase(product) {
+    setSaved("Save");
+    product.quantity_case=product.quantity_case+1;
+    forceUpdate();
+ }; 
 
  function check()
 {
@@ -132,15 +147,23 @@ async function firstStep() {
           <label class="form-check-label" for="pizzaCheckbox">Pizza</label>
         </div>
       </div>
+      <div class="container-fluid d-flex flex-row justify-content-evenly ">
+        <div class="container-fluid">
+          <h5>Name</h5>
+        </div>
+        <div class="container-fluid d-flex flex-row justify-content-around">
+          <h5>Unit</h5>
+          <h5>Case</h5>
+        </div>
+      </div>
       {error && <Alert variant="danger">{error}</Alert>}
-      <div class="accordion" id="accordionExample">
+      <div class="accordion container-fluid" id="accordionExample">
                         {products.map((product) => {
                               return <div class="container row allign-items-center">
                                         <div class="accordion-item d-flex flex-row justify-content-between">
                                               <div class="flex-fill">
                                               <h2 class="accordion-header" id={`heading${product.id}`}>
-                                                  <button dir="ltr" class="accordion-button collapsed d-flex justify-content-start" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${product.id}`} aria-expanded="false" aria-controls={`collapse${product.id}`}>
-                                                        <img style={{width: "90px", height: "90px", objectFit: "contain"}} alt='Loading...' src={process.env.PUBLIC_URL + '/logo.png'} />
+                                                  <button dir="ltr" class="mt-4 mb-4 accordion-button collapsed d-flex justify-content-start" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${product.id}`} aria-expanded="false" aria-controls={`collapse${product.id}`}>
                                                     {product.name}
                                                  </button>
                                               </h2>
@@ -151,6 +174,13 @@ async function firstStep() {
                                                   {product.quantity}
                                               </div>
                                               <button onClick={() => addOne(product)} style={{backgroundColor: "white", border: "none"}}><i class="bi bi-plus-circle p-1" style={{fontSize: "2rem"}}></i></button>
+                                          </div>
+                                          <div class="d-flex justify-content-between align-self-center">
+                                              <button onClick={() => subtractOneCase(product)} style={{backgroundColor: "white", border: "none"}}><i class="bi bi-dash-circle p-1" style={{fontSize: "2rem"}}></i></button>
+                                              <div class="container border border-dark border-4 text-wrap d-flex allign-items-center" style={{width: "40px", height: "40px"}}>
+                                                  {product.quantity_case}
+                                              </div>
+                                              <button onClick={() => addOneCase(product)} style={{backgroundColor: "white", border: "none"}}><i class="bi bi-plus-circle p-1" style={{fontSize: "2rem"}}></i></button>
                                           </div>
                                           </div>
                                                <div id={`collapse${product.id}`} class="accordion-collapse collapse" aria-labelledby={`heading${product.id}`}data-bs-parent="#accordionFlushExample">
